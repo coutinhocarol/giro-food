@@ -123,14 +123,12 @@ exports.updateProduct = async (req, res) => {
 
     const validatedBody = {};
 
-    // 2. FILTRAGEM DE CAMPOS (Padrão: updateRestaurant)
     Object.keys(req.body).forEach((key) => {
       if (allowedUpdates.includes(key)) {
         validatedBody[key] = req.body[key];
       }
     });
 
-    // 3. Verificação de Campos Válidos
     if (Object.keys(validatedBody).length === 0) {
       return res.status(400).json({
         success: false,
@@ -140,7 +138,6 @@ exports.updateProduct = async (req, res) => {
       });
     }
 
-    // 4. Execução da Atualização Segura
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       validatedBody,
@@ -156,21 +153,22 @@ exports.updateProduct = async (req, res) => {
         .json({ success: false, message: "Produto não encontrado." });
     }
 
-    res.status(200).json({ success: true, data: product });
+    return res.status(200).json({ success: true, data: product });
   } catch (error) {
-    // 5. Tratamento de Erros (Padrão)
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
       return res
         .status(400)
         .json({ success: false, message: messages.join(", ") });
     }
+
     if (error.name === "CastError") {
       return res
         .status(400)
         .json({ success: false, message: "ID de produto inválido." });
     }
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Erro interno ao atualizar produto.",
       error: error.message,
@@ -193,15 +191,15 @@ exports.deleteProduct = async (req, res) => {
         .json({ success: false, message: "Produto não encontrado." });
     }
 
-    // Retorna 204 No Content (Padrão: deleteRestaurant)
-    res.status(204).json({ success: true, data: {} });
+    return res.status(204).json({ success: true, data: {} });
   } catch (error) {
     if (error.name === "CastError") {
       return res
         .status(400)
         .json({ success: false, message: "ID de produto inválido." });
     }
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Erro ao excluir produto.",
       error: error.message,

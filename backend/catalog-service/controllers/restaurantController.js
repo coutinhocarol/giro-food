@@ -174,7 +174,7 @@ exports.updateRestaurant = async (req, res) => {
         .json({ success: false, message: "Restaurante não encontrado." });
     }
 
-    res.status(200).json({ success: true, data: restaurant });
+    return res.status(200).json({ success: true, data: restaurant });
   } catch (error) {
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
@@ -189,7 +189,7 @@ exports.updateRestaurant = async (req, res) => {
         .json({ success: false, message: "ID de restaurante inválido." });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Erro interno ao atualizar restaurante.",
       error: error.message,
@@ -212,14 +212,15 @@ exports.deleteRestaurant = async (req, res) => {
         .json({ success: false, message: "Restaurante não encontrado." });
     }
 
-    res.status(204).json({ success: true, data: {} });
+    return res.status(204).json({ success: true, data: {} });
   } catch (error) {
     if (error.name === "CastError") {
       return res
         .status(400)
         .json({ success: false, message: "ID de restaurante inválido." });
     }
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Erro ao excluir restaurante.",
       error: error.message,
