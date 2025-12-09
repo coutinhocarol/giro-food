@@ -23,13 +23,14 @@ exports.getAllRestaurants = async (req, res) => {
     });
   }
 
-  let filter = {};
-  if (req.query.isOpen !== undefined) {
-    filter.isOpen = req.query.isOpen.toLowerCase() === "true";
-  }
-
   try {
-    const restaurants = await Restaurant.find(filter).sort({ name: 1 });
+    let filter = {};
+
+    if (req.query.isOpen !== undefined) {
+      filter.isOpen = req.query.isOpen.toLowerCase() === "true";
+    }
+
+    const restaurants = await Restaurant.find(filter).sort("name");
 
     return res.status(200).json({
       success: true,
@@ -37,6 +38,13 @@ exports.getAllRestaurants = async (req, res) => {
       data: restaurants,
     });
   } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "ID de recurso inválido no filtro.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "Erro do servidor ao buscar restaurantes.",
@@ -64,7 +72,7 @@ exports.getRestaurantDetails = async (req, res) => {
       isAvailable: true,
     }).select("-restaurant");
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         restaurantDetails: restaurant,
@@ -78,7 +86,7 @@ exports.getRestaurantDetails = async (req, res) => {
         .json({ success: false, message: "ID de restaurante inválido." });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Erro do servidor ao buscar detalhes.",
       error: error.message,
@@ -94,7 +102,7 @@ exports.getRestaurantDetails = async (req, res) => {
 exports.createRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.create(req.body);
-    res.status(201).json({ success: true, data: restaurant });
+    return res.status(201).json({ success: true, data: restaurant });
   } catch (error) {
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
@@ -111,7 +119,7 @@ exports.createRestaurant = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Erro interno ao criar restaurante.",
       error: error.message,

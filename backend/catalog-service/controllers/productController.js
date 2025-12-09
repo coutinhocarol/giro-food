@@ -1,16 +1,15 @@
 const Product = require("../models/product");
 const Restaurant = require("../models/restaurant");
 
-// --- Leitura e Filtro (Read) ---
+// --- Leitura (Read) ---
 
 // @desc    Busca e filtra produtos no catálogo, com validação de filtros
-// @route   GET /api/v1/products?name=...&category=...&restaurantId=...&isAvailable=...
+// @route   GET /api/v1/products?name=...&category=...&restaurant=...&isAvailable=...
 // @access  Public
 exports.searchProducts = async (req, res) => {
-  const allowedFilters = ["name", "category", "restaurantId", "isAvailable"];
+  const allowedFilters = ["name", "category", "restaurant", "isAvailable"];
   const queryKeys = Object.keys(req.query);
 
-  // Validação estrita de query params (Padrão: getAllRestaurants)
   const invalidFilters = queryKeys.filter(
     (key) => !allowedFilters.includes(key)
   );
@@ -24,37 +23,34 @@ exports.searchProducts = async (req, res) => {
   }
 
   try {
-    const { name, category, restaurantId, isAvailable } = req.query;
+    const { name, category, restaurant, isAvailable } = req.query;
     const filter = {};
 
-    // O campo isAvailable é importante, permitindo que o admin veja indisponíveis,
-    // mas o público geral deve ver apenas os disponíveis. Por padrão, não filtramos aqui
-    // para dar flexibilidade, mas o frontend pode passar explicitamente.
     if (isAvailable !== undefined) {
       filter.isAvailable = isAvailable.toLowerCase() === "true";
     }
 
-    if (restaurantId) filter.restaurant = restaurantId;
-    // $regex para busca parcial e $options: "i" para case-insensitive
+    if (restaurant) filter.restaurant = restaurant;
     if (name) filter.name = { $regex: name, $options: "i" };
     if (category) filter.category = category;
 
     const products = await Product.find(filter)
-      // Popula o campo 'restaurant' para mostrar nome e tipo de cozinha
-      .populate("restaurant", "name cuisineType")
+      .populate("restaurant", "name")
       .sort("name");
 
-    res
-      .status(200)
-      .json({ success: true, count: products.length, data: products });
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
   } catch (error) {
-    // Tratamento de CastError (Se o restaurantId ou outro ID for inválido)
     if (error.name === "CastError") {
       return res
         .status(400)
         .json({ success: false, message: "ID de recurso inválido no filtro." });
     }
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Erro do servidor ao buscar produtos.",
       error: error.message,
@@ -69,11 +65,8 @@ exports.searchProducts = async (req, res) => {
 // @access  Private
 exports.createProduct = async (req, res) => {
   try {
-    const { restaurant } = req.body;
-
-    // 1. Verifica se o ID do restaurante é válido e existe (Boa Prática)
-    const restaurantExists = await Restaurant.findById(restaurant);
-    if (!restaurantExists) {
+    const restaurant = await Restaurant.findById(req.body.restaurant);
+    if (!restaurant) {
       return res.status(404).json({
         success: false,
         message: "Restaurante associado não encontrado.",
@@ -81,10 +74,8 @@ exports.createProduct = async (req, res) => {
     }
 
     const product = await Product.create(req.body);
-
-    res.status(201).json({ success: true, data: product });
+    return res.status(201).json({ success: true, data: product });
   } catch (error) {
-    // Tratamento de Erro de Validação de Schema (400)
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
       return res
@@ -92,7 +83,6 @@ exports.createProduct = async (req, res) => {
         .json({ success: false, message: messages.join(", ") });
     }
 
-    // Tratamento de Erro de Chave Duplicada (400 - Padrão: createRestaurant)
     if (error.code && error.code === 11000) {
       const field = Object.keys(error.keyValue)[0];
       return res.status(400).json({
@@ -101,7 +91,6 @@ exports.createProduct = async (req, res) => {
       });
     }
 
-    // Tratamento de CastError (se o ID do restaurante no body for inválido)
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
@@ -109,8 +98,7 @@ exports.createProduct = async (req, res) => {
       });
     }
 
-    // Erro Interno (500)
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Erro ao criar produto.",
       error: error.message,
@@ -125,7 +113,6 @@ exports.createProduct = async (req, res) => {
 // @access  Private
 exports.updateProduct = async (req, res) => {
   try {
-    // 1. LISTA DE CAMPOS PERMITIDOS (Whitelisting - Ajuste para seu Schema)
     const allowedUpdates = [
       "name",
       "description",
