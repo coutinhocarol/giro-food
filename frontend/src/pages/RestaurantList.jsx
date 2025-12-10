@@ -2,12 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchRestaurants } from '../services/catalogService';
 
-function RestaurantCard({ name, cuisine, deliveryTime, onClick }) {
+function RestaurantCard({ name, cuisineType, estimatedDeliveryTime, image, onClick }) {
+    
+    const bgImage = image ? `url(${image})` : '#ccc';
+
     return (
-        <div className="restaurant-card" onClick={onClick} style={{ border: '1px solid #ccc', padding: '15px', margin: '10px', cursor: 'pointer' }}>
-            <h3>{name}</h3>
-            <p>Culinária: {cuisine}</p>
-            <p>Entrega Estimada: {deliveryTime} min</p>
+        <div className="restaurant-card" onClick={onClick}>
+            <div 
+                className="card-image-placeholder" 
+                style={{ backgroundImage: bgImage }}
+            ></div>
+            <div className="card-info">
+                <h3 className="card-title">{name}</h3>
+                <div className="card-details">
+                    {}
+                    <span>⭐ 4.8 • {cuisineType}</span>
+                    <span>{estimatedDeliveryTime} min • Grátis</span>
+                </div>
+            </div>
         </div>
     );
 }
@@ -35,8 +47,7 @@ export default function RestaurantList() {
     }, []);
 
     const handleSelectRestaurant = (id) => {
-        console.log(`Selecionado restaurante ${id}`);
-        navigate('/order');
+    navigate(`/restaurant/${id}`);
     };
 
     if (loading) {
@@ -56,14 +67,12 @@ export default function RestaurantList() {
             <h2>Restaurantes Disponíveis</h2>
             <div className="restaurants-grid">
                 {restaurants.map(r => (
-                    <RestaurantCard 
-                        key={r.id} 
-                        name={r.name} 
-                        cuisine={r.cuisineType}
-                        deliveryTime={r.estimatedDeliveryTime}
-                        onClick={() => handleSelectRestaurant(r.id)} 
-                    />
-                ))}
+    <RestaurantCard 
+        key={r.id} 
+        {...r}
+        onClick={() => handleSelectRestaurant(r.id)} 
+    />
+))}
             </div>
         </div>
     );
