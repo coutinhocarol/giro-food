@@ -42,7 +42,12 @@ export default function OrderCreation() {
             setMessage(`✅ Pedido #${newOrder.id} criado com sucesso!`);
             setOrderSuccessId(newOrder.id);
         } catch (error) {
+<<<<<<< Updated upstream
             setMessage(`❌ Falha ao criar pedido: ${error.message}`);
+=======
+            console.error(error);
+            setMessage('❌ Não foi possível criar o pedido. Tente novamente em alguns instantes.');
+>>>>>>> Stashed changes
         } finally {
             setIsProcessing(false);
         }
