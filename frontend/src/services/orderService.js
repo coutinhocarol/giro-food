@@ -1,13 +1,10 @@
-const ORDER_BASE_URL = "http://localhost:3006/api/v1"; 
-<<<<<<< Updated upstream
-import { getAuthHeaders } from './authService';
+import { getAuthHeaders } from "./authService";
 
-=======
+const ORDER_BASE_URL = "http://localhost:3006/api/v1"; 
 
 /**
  * Cria um novo pedido usando apenas o microsserviço de Pedidos.
  */
->>>>>>> Stashed changes
 export async function createOrder(orderData) {
     try {
         const response = await fetch(`${ORDER_BASE_URL}/orders`, {
@@ -16,12 +13,6 @@ export async function createOrder(orderData) {
             body: JSON.stringify(orderData)
         });
         const data = await response.json();
-<<<<<<< Updated upstream
-        if (!response.ok) throw new Error(data.message || "Erro ao finalizar o pedido.");
-        return data.data; 
-    } catch (error) {
-        console.error("Erro na Criação de Pedido:", error.message);
-=======
 
         if (!response.ok) {
             throw new Error(data.message || "Erro ao finalizar o pedido.");
@@ -31,13 +22,10 @@ export async function createOrder(orderData) {
         return data.data;
     } catch (error) {
         console.error("Erro ao criar pedido:", error);
->>>>>>> Stashed changes
         throw error;
     }
 }
 
-<<<<<<< Updated upstream
-=======
 /**
  * Converte o formato de pedido vindo da API
  * para o formato esperado pelas telas de histórico e rastreamento.
@@ -124,31 +112,28 @@ export async function getOrderById(orderId) {
 /**
  * Consulta o status atual do pedido no microsserviço de Pedidos.
  */
->>>>>>> Stashed changes
 export async function trackOrder(orderId) {
-    try {
-        const response = await fetch(`${ORDER_BASE_URL}/orders/${orderId}/status`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+  try {
+    const response = await fetch(`${ORDER_BASE_URL}/orders/${orderId}`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
 
-        const data = await response.json();
-<<<<<<< Updated upstream
-        if (!response.ok) throw new Error(data.message || "Não foi possível acompanhar o pedido.");
-        return data.data; 
-    } catch (error) {
-        console.error("Erro no Acompanhamento de Pedido:", error.message);
-=======
+    const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(data.message || "Erro ao acompanhar o status do pedido.");
-        }
-
-        // Espera-se que a API retorne { data: { currentStatus, ... } }
-        return data.data;
-    } catch (error) {
-        console.error("Erro ao acompanhar o status do pedido:", error);
->>>>>>> Stashed changes
-        throw error;
+    if (!response.ok) {
+      throw new Error(data.message || "Erro ao acompanhar o status do pedido.");
     }
+
+    const order = data.data;
+
+    return {
+      orderId: order.id,
+      currentStatus: order.status,
+      lastUpdate: order.updatedAt || order.createdAt
+    };
+  } catch (error) {
+    console.error("Erro ao acompanhar o status do pedido:", error);
+    throw error;
+  }
 }

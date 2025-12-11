@@ -10,13 +10,18 @@ export class OrderBuilder {
         };
     }
 
-    addItem(productId, quantity, price) {
-        if (quantity > 0) {
-            this.order.items.push({ productId, quantity, price });
-            this.order.totalAmount += price * quantity;
-        }
-        return this; 
-    }
+   addItem(productId, quantity, price) {
+  if (quantity > 0) {
+    this.order.items.push({
+      productId,
+      restaurantId: this.order.restaurantId,
+      quantity,
+      price
+    });
+    this.order.totalAmount += price * quantity;
+  }
+  return this;
+}
 
     setAddress(address) {
         if (typeof address !== 'string' || address.trim() === '') throw new Error("Endereço de entrega é obrigatório.");
