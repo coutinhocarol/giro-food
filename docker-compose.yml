@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # --- SERVIÇO DE AUTENTICAÇÃO ---
+  autenticacao-service:
+    build:
+      context: ./backend/autentication-service
+      dockerfile: Dockerfile
+    container_name: autenticacao_container
+    ports:
+      # Mapeia 8080 da sua máquina para a porta 3000 do container
+      - "8080:3000"
+    # Assume que você usa um arquivo .env para variáveis de ambiente
+    env_file:
+      - ./backend/autentication-service/.env
+    depends_on:
+      - db-autenticacao
+    restart: always
+
+  # --- SERVIÇO DE CATÁLOGO ---
+  catalog-service:
+    build:
+      context: ./backend/catalog-service
+      dockerfile: Dockerfile
+    container_name: catalogo_container
+    ports:
+      # Mapeia 8081 da sua máquina para a porta 3000 do container
+      - "8081:3004"
+    env_file:
+      - ./backend/catalog-service/.env
+    depends_on:
+      - db-catalogo
+    restart: always
+
+  # --- SERVIÇO DE PEDIDOS ---
+  order-service:
+    build:
+      context: ./backend/order-service
+      dockerfile: Dockerfile
+    container_name: pedido_container
+    ports:
+      # Mapeia 8082 da sua máquina para a porta 3000 do container
+      - "8082:3005"
+    env_file:
+      - ./backend/order-service/.env
+    depends_on:
+      - db-pedidos
+      - autenticacao-service
+      - catalog-service
+    restart: always
+    # Exemplo: O serviço de pedidos PRECISA de catálogo e autenticação
+
+# --- BANCOS DE DADOS ---
+
+  db-autenticacao:
+    image: mongo:5.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER_AUTH} 
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME_AUTH}
+    volumes:
+      - mongo_auth_data:/data/auth
+    restart: always
+
+  db-catalogo:
+    image: mongo:5.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER_CATALOG} 
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME_CATALOG}
+    volumes:
+      - mongo_catalog_data:/data/catalog
+    restart: always
+
+  db-pedidos:
+    image: mongo:5.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER_ORDER} 
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME_ORDER}
+    volumes:
+      - mongo_order_data:/data/order
+    restart: always
+
+# Volumes podem ser adicionados aqui para persistência de dados de bancos, etc.
+volumes:
+  mongo_auth_data:
+  mongo_catalog_data:
+  mongo_order_data:
