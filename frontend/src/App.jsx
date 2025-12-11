@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
-import { AuthProvider} from "./context/AuthContext"; 
+import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -11,7 +11,6 @@ import OrderTracking from "./pages/OrderTracking";
 import OrderHistory from "./pages/OrderHistory";
 import Login from "./pages/Login";
 import Register from "./pages/register";
-
 import "./index.css";
 
 function Layout({ children }) {
@@ -27,8 +26,7 @@ function Layout({ children }) {
     <div>
       <header className="app-header">
         <Link to="/" className="logo">
-          Giro
-          <span style={{ color: "#333", fontSize: "1rem", marginLeft: "5px" }}>Food</span>
+          Giro<span style={{ color: "#333", fontSize: "1rem", marginLeft: "5px" }}>Food</span>
         </Link>
         <div style={{ display: "flex", gap: "20px", fontSize: "0.9rem", fontWeight: "600" }}>
           <Link to="/" style={{ textDecoration: "none", color: "#ea1d2c" }}>Início</Link>
@@ -37,7 +35,9 @@ function Layout({ children }) {
           {isAuthenticated ? (
             <>
               <Link to="/orders-history" style={{ textDecoration: "none", color: "#717171" }}>Pedidos</Link>
-              <button onClick={handleLogout} className="auth-button ghost" style={{padding: '0 8px', fontSize: '0.85rem'}}>Sair</button>
+              <button onClick={handleLogout} className="auth-button ghost" style={{padding: '0 15px', fontSize: '0.85rem', width: 'auto'}}>
+                Sair
+              </button>
             </>
           ) : (
             <Link to="/login" style={{ textDecoration: "none", color: "#717171" }}>Entrar</Link>
