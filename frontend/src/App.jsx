@@ -1,17 +1,28 @@
-import { BrowserRouter, Routes, Route, Link, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
-import RestaurantList from "./pages/RestaurantList";
-import RestaurantMenu from "./pages/RestaurantMenu"; 
-import Login from "./pages/Login"; 
-import Register from "./pages/register"; 
+import { AuthProvider} from "./context/AuthContext"; 
+import { useAuth } from "./hooks/useAuth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
+import RestaurantList from "./pages/RestaurantList";
+import RestaurantMenu from "./pages/RestaurantMenu";
 import OrderCreation from "./pages/OrderCreation";
 import OrderTracking from "./pages/OrderTracking";
-import ProtectedRoute from "./components/ProtectedRoute";
+import OrderHistory from "./pages/OrderHistory";
+import Login from "./pages/Login";
+import Register from "./pages/register";
 
 import "./index.css";
 
 function Layout({ children }) {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <div>
       <header className="app-header">
@@ -21,9 +32,16 @@ function Layout({ children }) {
         </Link>
         <div style={{ display: "flex", gap: "20px", fontSize: "0.9rem", fontWeight: "600" }}>
           <Link to="/" style={{ textDecoration: "none", color: "#ea1d2c" }}>Início</Link>
-          <Link to="/orders-history" style={{ textDecoration: "none", color: "#717171" }}>Pedidos</Link>
           <Link to="/order" style={{ textDecoration: "none", color: "#717171" }}>Sacola</Link>
-          <Link to="/login" style={{ textDecoration: "none", color: "#717171" }}>Entrar</Link>
+          
+          {isAuthenticated ? (
+            <>
+              <Link to="/orders-history" style={{ textDecoration: "none", color: "#717171" }}>Pedidos</Link>
+              <button onClick={handleLogout} className="auth-button ghost" style={{padding: '0 8px', fontSize: '0.85rem'}}>Sair</button>
+            </>
+          ) : (
+            <Link to="/login" style={{ textDecoration: "none", color: "#717171" }}>Entrar</Link>
+          )}
         </div>
       </header>
       <main className="container">{children}</main>
@@ -38,23 +56,26 @@ function OrderTrackingWrapper() {
 
 function App() {
   return (
-    <CartProvider>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<RestaurantList />} />
-            <Route path="/restaurant/:id" element={<RestaurantMenu />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+    <AuthProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<RestaurantList />} />
+              <Route path="/restaurant/:id" element={<RestaurantMenu />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/order" element={<OrderCreation />} />
-              <Route path="/tracking/:orderId" element={<OrderTrackingWrapper />} />
-            </Route>
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </CartProvider>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/order" element={<OrderCreation />} />
+                <Route path="/orders-history" element={<OrderHistory />} />
+                <Route path="/tracking/:orderId" element={<OrderTrackingWrapper />} />
+              </Route>
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 
