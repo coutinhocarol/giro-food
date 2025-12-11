@@ -169,6 +169,7 @@ button:focus-visible {
   font-size: 0.95rem;
   outline: none;
   background-color: #fafafa;
+  color: #333333;
 }
 
 .auth-field input:focus {
