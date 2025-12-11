@@ -1,10 +1,5 @@
 const AUTH_BASE_URL = "http://localhost:3005/api/v1";
 
-/**
- * Login do usuário no microsserviço de Autenticação.
- * Espera que o backend responda com algo como:
- * { token: "...", user: { ... } }
- */
 export async function login(email, password) {
   try {
     const response = await fetch(`${AUTH_BASE_URL}/auth/login`, {
@@ -23,17 +18,13 @@ export async function login(email, password) {
       localStorage.setItem("userToken", data.token);
     }
 
-    return data.user; // pode ajustar conforme o backend
+    return data.user;
   } catch (error) {
     console.error("Erro no Login:", error.message);
     throw error;
   }
 }
 
-/**
- * Registro de novo usuário no microsserviço de Autenticação.
- * Ajuste os campos (name, email, password) se o backend usar outro nome.
- */
 export async function register(name, email, password) {
   try {
     const response = await fetch(`${AUTH_BASE_URL}/auth/register`, {
@@ -48,7 +39,6 @@ export async function register(name, email, password) {
       throw new Error(data.message || "Falha no registro.");
     }
 
-    // Se o backend também já devolver token no registro:
     if (data.token) {
       localStorage.setItem("userToken", data.token);
     }
@@ -56,7 +46,7 @@ export async function register(name, email, password) {
     return data.user || { name, email };
   } catch (error) {
     console.error("Erro no Registro:", error.message);
-    throw error;
+    throw error; 
   }
 }
 

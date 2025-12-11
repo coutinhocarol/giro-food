@@ -18,17 +18,7 @@ export function CartProvider({ children }) {
             if (existing) {
                 return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
             }
-            return [...prev, { ...item, quantity: 1 }];
-        });
-    };
-    const decreaseItem = (itemId) => {
-        setCart(prev => {
-            return prev.map(item => {
-                if (item.id === itemId) {
-                    return { ...item, quantity: item.quantity - 1 };
-                }
-                return item;
-            }).filter(item => item.quantity > 0);
+            return [...prev, { ...item, quantity: 1, restaurantId: currentRestaurantId }]; 
         });
     };
 
@@ -36,11 +26,11 @@ export function CartProvider({ children }) {
         setCart([]);
         setRestaurantId(null);
     };
-
+    
     const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, decreaseItem, clearCart, total, restaurantId }}>
+        <CartContext.Provider value={{ cart, addToCart, clearCart, total, restaurantId }}>
             {children}
         </CartContext.Provider>
     );

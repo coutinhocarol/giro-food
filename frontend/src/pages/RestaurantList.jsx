@@ -35,8 +35,7 @@ export default function RestaurantList() {
     }, []);
 
     const handleSelectRestaurant = (id) => {
-        console.log(`Selecionado restaurante ${id}`);
-        navigate('/order');
+        navigate(`/restaurant/${id}`); 
     };
 
     if (loading) {
