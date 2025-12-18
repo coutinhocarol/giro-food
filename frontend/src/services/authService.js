@@ -1,28 +1,4 @@
-const AUTH_BASE_URL = "http://localhost:3005/api/v1";
-
-export function getToken() {
-  return localStorage.getItem("userToken");
-}
-
-export function setToken(token) {
-  localStorage.setItem("userToken", token);
-}
-
-export function removeToken() {
-  localStorage.removeItem("userToken");
-}
-
-export function getAuthHeaders() {
-  const token = getToken();
-  if (token) {
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  }
-  return { "Content-Type": "application/json" };
-}
-
+const AUTH_BASE_URL = "http://localhost:8080/api/v1";
 
 export async function login(email, password) {
   try {
@@ -38,12 +14,11 @@ export async function login(email, password) {
       throw new Error(data.message || "Falha na autenticação.");
     }
 
-    if (data.token || (data.data && data.data.token)) {
-      const token = data.token || data.data.token;
-      setToken(token);
+    if (data.token) {
+      localStorage.setItem("userToken", data.token);
     }
 
-    return data.data || data.user;
+    return data;
   } catch (error) {
     console.error("Erro no Login:", error.message);
     throw error;
@@ -52,16 +27,10 @@ export async function login(email, password) {
 
 export async function register(name, email, password) {
   try {
-    const payload = { 
-        username: name,
-        email, 
-        password 
-    };
-
     const response = await fetch(`${AUTH_BASE_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ username: name, email, password }),
     });
 
     const data = await response.json();
@@ -69,13 +38,12 @@ export async function register(name, email, password) {
     if (!response.ok) {
       throw new Error(data.message || "Falha no registro.");
     }
-
-    if (data.token || (data.data && data.data.token)) {
-        const token = data.token || data.data.token;
-        setToken(token);
+    
+    if (data.token) {
+      localStorage.setItem("userToken", data.token);
     }
 
-    return data.data || data.user;
+    return data.user || { name, email };
   } catch (error) {
     console.error("Erro no Registro:", error.message);
     throw error;
@@ -83,5 +51,20 @@ export async function register(name, email, password) {
 }
 
 export function logout() {
-  removeToken();
+  localStorage.removeItem("userToken");
+}
+
+export function getToken() {
+  return localStorage.getItem("userToken");
+}
+
+export function getAuthHeaders() {
+  const token = getToken();
+  if (token) {
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+  }
+  return { "Content-Type": "application/json" };
 }
