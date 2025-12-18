@@ -29,12 +29,12 @@ exports.registerUser = async (req, res) => {
         res.status(201).json({
             success: true,
             message: 'Usuário registrado com sucesso!',
-            data: {
+            token: generateToken(user.id),
+            user: {
                 id: user.id,
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                token: generateToken(user.id),
             },
         });
     } catch (error) {
@@ -75,7 +75,7 @@ exports.loginUser = async (req, res) => {
             return res.status(200).json({
                 success: true,
                 message: 'Login bem-sucedido!',
-                data: {
+                user: {
                     id: user.id,
                     username: user.username,
                     email: user.email,
