@@ -3,6 +3,7 @@ var dotenv = require("dotenv");
 var mongoose = require("mongoose");
 var logger = require("morgan");
 var cookieParser = require("cookie-parser");
+var cors = require("cors");
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,11 @@ connectDB();
 const app = express();
 
 // --- Middlewares Comuns ---
+app.use(cors({
+  origin: "http://localhost:5173", // URL exata do seu frontend React/Vite
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -43,7 +49,7 @@ app.use("/api/v1/auth", authRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Auth Service escutando na porta ${PORT}`);
 });
 
