@@ -47,7 +47,7 @@ export default function RestaurantMenu() {
                     
                     <button 
                         className="btn-add auth-button primary" 
-                        onClick={() => addToCart(item, restaurant.id)}
+                        onClick={() => addToCart(item, restaurant.id, restaurant.name)}
                     >
                         Adicionar ({cart.find(i => i.id === item.id)?.quantity || 0})
                     </button>

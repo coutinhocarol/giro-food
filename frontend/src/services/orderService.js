@@ -28,11 +28,15 @@ function normalizeOrder(apiOrder) {
 
     const status = apiOrder.status || "DESCONHECIDO";
 
+    const calculatedTotal = apiOrder.items 
+        ? apiOrder.items.reduce((acc, item) => acc + (Number(item.price) * Number(item.quantity)), 0)
+        : 0;
+
     return {
         id: apiOrder.id,
-        restaurantName: "Restaurante Parceiro",
+        restaurantName: apiOrder.restaurantName || "Restaurante (Nome não salvo)",
         items: apiOrder.items || [],
-        total: apiOrder.total ?? 0, 
+        total: calculatedTotal, 
         date: apiOrder.createdAt || new Date().toISOString(),
         status: status
     };

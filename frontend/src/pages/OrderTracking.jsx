@@ -29,6 +29,11 @@ export default function OrderTracking({ orderId: propOrderId }) {
     useEffect(() => {
         if (loading) return;
 
+        if (['Entregue', 'Cancelado'].includes(status)) {
+            setDisplayStatus(status);
+            return;
+        }
+
         const flux = [
             'Aguardando confirmação',
             'Confirmado',

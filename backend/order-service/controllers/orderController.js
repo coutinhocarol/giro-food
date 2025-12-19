@@ -5,9 +5,8 @@ const eventBus = require('../events/eventBus');
 // @route POST /api/v1/orders
 // @access Private
 exports.createOrder = async (req, res) => {
-  //const userId = req.userId;
   const userId = req.userId;
-  const { items } = req.body;
+  const { items, restaurantName } = req.body; 
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({
@@ -16,10 +15,18 @@ exports.createOrder = async (req, res) => {
     });
   }
 
+  if (!restaurantName) {
+      return res.status(400).json({
+          success: false,
+          message: 'O nome do restaurante é obrigatório.'
+      });
+  }
+
   try {
     const order = await Order.create({
       userId,
       items,
+      restaurantName,
       status: 'Aguardando confirmação'
     });
 
@@ -154,5 +161,29 @@ exports.cancelOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'ID de pedido inválido.' });
     }
     return res.status(500).json({ success: false, message: 'Erro ao cancelar pedido.', error: error.message });
+  }
+};
+
+// --- Listar pedidos do usuário logado ---
+// @route GET /api/v1/orders
+// @access Private
+exports.getMyOrders = async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Erro ao buscar histórico de pedidos.', 
+      error: error.message 
+    });
   }
 };

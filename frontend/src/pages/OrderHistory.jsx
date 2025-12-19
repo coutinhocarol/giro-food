@@ -39,13 +39,8 @@ export default function OrderHistory() {
                         padding: '15px', 
                         border: '1px solid #eee',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                        cursor: 'pointer',
-                        transition: '0.2s'
-                    }}
-                    onClick={() => navigate(`/tracking/${order.id}`)}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = '#ccc'}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = '#eee'}
-                    >
+                        marginBottom: '15px'
+                    }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                             <strong style={{ color: '#3e3e3e', fontSize: '1.1rem' }}>
                                 {order.restaurantName}
@@ -57,32 +52,33 @@ export default function OrderHistory() {
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ fontSize: '0.9rem', color: '#717171' }}>
-                                
                                 <span style={{ 
                                     display: 'inline-block', width: '8px', height: '8px', 
                                     borderRadius: '50%', 
-                                    background: (order.status === 'ENTREGUE' || order.status === 'CONCLUIDO') ? 'green' : (order.status === 'CANCELADO' ? 'red' : '#ea1d2c'),
+                                    background: order.status === 'Entregue' ? 'green' : '#ea1d2c',
                                     marginRight: '6px'
                                 }}></span>
                                 
-                                {(() => {
-                                    if (order.status === 'ENTREGUE') return 'Concluído';
-                                    if (order.status === 'CANCELADO') return 'Cancelado';
-                                    return order.status.replace(/_/g, ' '); 
-                                })()}
+                                {order.status}
 
                                 <span style={{ margin: '0 5px' }}>•</span>
-                                ID: {order.id}
-                            </div>
-                            
-                            <div style={{ color: '#ea1d2c', fontWeight: 'bold' }}>
-                                Ver detalhes &gt;
+                                <span style={{ fontSize: '0.8em' }}>ID: {order.id}</span>
                             </div>
                         </div>
+
                         <div style={{ marginTop: '10px', borderTop: '1px solid #f0f0f0', paddingTop: '10px', fontSize: '0.9rem' }}>
-                             {order.items && order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                             {order.items && order.items.map((i, index) => (
+                                 <div key={index}>
+                                     {i.quantity}x {i.name || "Item sem nome"} 
+                                     <span style={{color: '#999', fontSize:'0.8em', marginLeft:'5px'}}>
+                                        (R$ {i.price.toFixed(2)})
+                                     </span>
+                                 </div>
+                             ))}
                              <br/>
-                             <strong>Total: R$ {order.total.toFixed(2)}</strong>
+                             <div style={{textAlign: 'right', fontSize: '1.1rem'}}>
+                                Total: <strong>R$ {order.total.toFixed(2)}</strong>
+                             </div>
                         </div>
                     </div>
                 ))}

@@ -5,7 +5,7 @@ import { OrderBuilder } from '../utils/orderBuilder';
 import { useCart } from '../context/CartContext';
 
 export default function OrderCreation() {
-    const { cart, total, restaurantId, clearCart } = useCart();
+    const { cart, total, restaurantId, restaurantName, clearCart } = useCart();
     const navigate = useNavigate();
 
     const [address, setAddress] = useState('');
@@ -30,10 +30,10 @@ export default function OrderCreation() {
         setMessage('Processando pedido e pagamento...');
 
         try {
-            const builder = new OrderBuilder(restaurantId); 
+            const builder = new OrderBuilder(restaurantId, restaurantName); 
             
             cart.forEach(item => {
-                builder.addItem(item.id, item.quantity, item.price); 
+                builder.addItem(item.id, item.quantity, item.price, item.name); 
             });
             
             const orderPayload = builder

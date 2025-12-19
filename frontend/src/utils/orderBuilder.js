@@ -1,8 +1,9 @@
 export class OrderBuilder {
-    constructor(restaurantId) {
+    constructor(restaurantId, restaurantName) {
         if (!restaurantId) throw new Error("O Pedido deve estar associado a um Restaurante.");
         this.order = {
             restaurantId: restaurantId,
+            restaurantName: restaurantName || "Restaurante Parceiro",
             items: [],
             deliveryAddress: null,
             paymentMethod: null,
@@ -10,18 +11,19 @@ export class OrderBuilder {
         };
     }
 
-   addItem(productId, quantity, price) {
-  if (quantity > 0) {
-    this.order.items.push({
-      productId,
-      restaurantId: this.order.restaurantId,
-      quantity,
-      price
-    });
-    this.order.totalAmount += price * quantity;
-  }
-  return this;
-}
+   addItem(productId, quantity, price, name) {
+      if (quantity > 0) {
+        this.order.items.push({
+          productId,
+          restaurantId: this.order.restaurantId,
+          quantity,
+          price,
+          name: name
+        });
+        this.order.totalAmount += price * quantity;
+      }
+      return this;
+    }
 
     setAddress(address) {
         if (typeof address !== 'string' || address.trim() === '') throw new Error("Endereço de entrega é obrigatório.");

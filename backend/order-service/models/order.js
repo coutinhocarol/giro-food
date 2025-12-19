@@ -7,6 +7,10 @@ const ItemSchema = new mongoose.Schema(
             type: String,
             required: true 
         },
+        name: { 
+            type: String, 
+            required: true
+         },
         restaurantId: {
             type: String,
             required: true
@@ -29,6 +33,7 @@ const ItemSchema = new mongoose.Schema(
 const OrderSchema = new mongoose.Schema(
     {
         userId: { type: String, required: true },
+        restaurantName: { type: String, required: true },
         items: { type: [ItemSchema], required: true, validate: v => Array.isArray(v) && v.length > 0 },
         status: {
             type: String,
