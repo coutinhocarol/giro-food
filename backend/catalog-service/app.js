@@ -2,6 +2,7 @@ var express = require("express");
 var dotenv = require("dotenv");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+var cors = require("cors");
 var mongoose = require("mongoose");
 
 // Load environment variables
@@ -45,6 +46,12 @@ mongoose.connection.on("error", (err) => {
 });
 
 const app = express();
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
 // --- Middlewares ---
 app.use(logger("dev"));

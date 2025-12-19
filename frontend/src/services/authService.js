@@ -50,7 +50,7 @@ export async function register(name, email, password) {
   }
 }
 
-export function logout() {
+export function removeToken() {
   localStorage.removeItem("userToken");
 }
 

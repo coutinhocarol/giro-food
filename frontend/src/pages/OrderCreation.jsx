@@ -46,7 +46,7 @@ export default function OrderCreation() {
             setMessage(`✅ Pedido #${newOrder.id} criado com sucesso!`);
             clearCart();
             
-            setTimeout(() => navigate(`/track/${newOrder.id}`), 500);
+            setTimeout(() => navigate(`/tracking/${newOrder.id}`), 500);
 
         } catch (error) {
             setMessage(`❌ Falha ao criar pedido: ${error.message || 'Erro de conexão.'}`);

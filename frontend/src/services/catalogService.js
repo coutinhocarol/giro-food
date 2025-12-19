@@ -1,4 +1,4 @@
-const CATALOG_BASE_URL = "http://localhost:3004/api/v1"; 
+const CATALOG_BASE_URL = "http://localhost:8081/api/v1"; 
 
 export async function fetchRestaurants() {
     try {

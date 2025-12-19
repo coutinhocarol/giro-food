@@ -1,6 +1,6 @@
 import { getAuthHeaders } from "./authService"; 
 
-const ORDER_BASE_URL = "http://localhost:3006/api/v1/orders"; 
+const ORDER_BASE_URL = "http://localhost:8082/api/v1/orders"; 
 
 export async function createOrder(orderData) {
     try {
